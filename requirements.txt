@@ -1,0 +1,5 @@
+matplotlib
+joycon-python
+hidapi
+pyglm
+pyautogui
