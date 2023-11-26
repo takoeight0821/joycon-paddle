@@ -1,0 +1,21 @@
+2023-11-27 00:55:41,036 Sent 0x010602 to (1406, 8199, '04:03:D6:A7:BB:FE')
+2023-11-27 00:55:41,042 JoyCons found: [(1406, 8199, '04:03:D6:A7:BB:FE')]
+Exception in thread Thread-1 (_update_input_report):
+Traceback (most recent call last):
+  File "/Users/yuya/.pyenv/versions/3.11.6/lib/python3.11/threading.py", line 1045, in _bootstrap_inner
+    self.run()
+  File "/Users/yuya/.pyenv/versions/3.11.6/lib/python3.11/threading.py", line 982, in run
+    self._target(*self._args, **self._kwargs)
+  File "/Users/yuya/.pyenv/versions/3.11.6/lib/python3.11/site-packages/pyjoycon/joycon.py", line 118, in _update_input_report
+    report = self._read_input_report()
+             ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/yuya/.pyenv/versions/3.11.6/lib/python3.11/site-packages/pyjoycon/joycon.py", line 72, in _read_input_report
+    return bytes(self._joycon_device.read(self._INPUT_REPORT_SIZE))
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "hid.pyx", line 234, in hid.device.read
+OSError: read error
+2023-11-27 00:55:42,055 No JoyCons found.
+^CTraceback (most recent call last):
+  File "/Users/yuya/dev/src/joycon-paddle/watch.py", line 33, in <module>
+    time.sleep(1)
+KeyboardInterrupt
