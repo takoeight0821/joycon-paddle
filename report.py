@@ -1,3 +1,5 @@
+# based on Joy-Conの加速度をリアルタイムプロットする[joycon-python] | mio.yokohama https://mio.yokohama/?p=1205
+
 import time
 import numpy as np
 from pyjoycon import device

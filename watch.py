@@ -32,10 +32,14 @@ while True:
         logging.warning("No JoyCons found.")
     else:
         logging.info("JoyCons found: " + str(ids))
+    removed = []
     for id in joyconTable:
         if id not in ids:
-            del joyconTable[id]
+            removed.append(id)
             logging.info("JoyCon disconnected: " + str(id))
+    for id in removed:
+        del joyconTable[id]
+        logging.info("JoyCon removed from table: " + str(id))
     for id in ids:
         if id in joyconTable:
             joycon = joyconTable[id]
