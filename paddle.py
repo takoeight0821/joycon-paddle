@@ -3,9 +3,9 @@ import numpy as np
 import pyautogui
 from pyjoycon import device
 from pyjoycon.joycon import JoyCon
-from typing import Dict, Deque, List
+from typing import Dict, Deque, List, Tuple
 
-def setupJoyCon() -> (JoyCon, JoyCon):
+def setupJoyCon() -> Tuple[JoyCon, JoyCon]:
     lid = device.get_L_id()
     ljoycon = JoyCon(*lid)
     rid = device.get_R_id()
@@ -15,7 +15,7 @@ def setupJoyCon() -> (JoyCon, JoyCon):
 def getAccel(joycon: JoyCon) -> Dict[str, float]:
     return joycon.get_status()["accel"]
 
-def addAverage(left: Dict[str, float], right: Dict[str, float]) -> None:
+def addAverage(left: Dict[str, float], right: Dict[str, float]) -> Dict[str, float]:
     return {"x": (left["x"] + right["x"]) / 2, "y": (left["y"] + right["y"]) / 2, "z": (left["z"] + right["z"]) / 2}
 
 def appendAccel(accel: Dict[str, float], X: Deque[float], Y: Deque[float], Z: Deque[float]) -> None:
@@ -39,7 +39,6 @@ def getVelocity(X: Deque[float], Y: Deque[float], Z: Deque[float]) -> float:
     vy = np.trapz(Y) / len(Y)
     vz = np.trapz(Z) / len(Z)
     return vx + vy + vz
-
 
 def main():
     dataLength = 60
