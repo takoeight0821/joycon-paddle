@@ -1,0 +1,6 @@
+- paddle.py
+  - main program
+- report.py
+  - report acceleration and velocity from JoyCon IMU
+- sketch_speed.py, watch.py, paddle_proto.py
+  - sketch for development
