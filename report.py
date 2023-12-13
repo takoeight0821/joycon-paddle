@@ -7,11 +7,15 @@ from pyjoycon.joycon import JoyCon
 from matplotlib import pyplot as plt
 from collections import deque
 import logging
+import numpy as np
+
+def velocity(accels):
+    return np.trapz(accels) / len(accels)
 
 # ---- #
 # init #
 # ---- #
-logging.basicConfig(filename='report.log', encoding='utf-8', level=logging.INFO)
+logging.basicConfig(filename= "report_" + time.strftime("%Y%m%d-%H%M%S") + ".log", encoding='utf-8', level=logging.INFO)
 
 # JoyCon
 id = device.get_L_id()
@@ -28,7 +32,7 @@ def filter(x, y, z):
     return [x - gravity[0], y - gravity[1], z - gravity[2]]
 
 # set figure
-x_lim = 100
+x_lim = 50
 width = 2.5
 t = np.zeros(100)
 y = np.zeros(100)
@@ -37,9 +41,12 @@ plt.figure()
 li = plt.plot(t, y)
 plt.ylim(0, 5)
 xlim = [0, x_lim]
-ylim = [-10000, 10000]
+ylim = [-100, 10000]
 X, Y, Z, T = deque(maxlen=x_lim), deque(maxlen=x_lim), deque(maxlen=x_lim), deque(maxlen=x_lim)
 GX, GY, GZ = deque(maxlen=x_lim), deque(maxlen=x_lim), deque(maxlen=x_lim)
+GXV, GYV, GZV = deque(maxlen=x_lim), deque(maxlen=x_lim), deque(maxlen=x_lim)
+GV = deque(maxlen=x_lim)
+
 # ---- #
 # plot #
 # ---- #
@@ -55,23 +62,26 @@ while True:
     Y.append(y)
     Z.append(z)
     [gx, gy, gz] = filter(x, y, z)
-    GX.append(gx)
-    GY.append(gy)
-    GZ.append(gz)
+    GX.append(np.abs(gx))
+    GY.append(np.abs(gy))
+    GZ.append(np.abs(gz))
+    GXV.append(velocity(np.abs(GX)))
+    GYV.append(velocity(np.abs(GY)))
+    GZV.append(velocity(np.abs(GZ)))
+    GV.append(GXV[-1] + GYV[-1] + GZV[-1])
     if len(T) == 0:
         T.append(0)
     else:
         T.append(T[-1]+1)
     logging.info("T: %d, X: %d, Y: %d, Z: %d, GX: %d, GY: %d, GZ: %d", T[-1], X[-1], Y[-1], Z[-1], GX[-1], GY[-1], GZ[-1])
+    logging.info("T: %d, GXV: %d, GYV: %d, GZV: %d, GV: %d", T[-1], GXV[-1], GYV[-1], GZV[-1], GV[-1])
     if len(X) >= x_lim:
         xlim[0] += 1
         xlim[1] += 1
-    # plt.plot(T, X, linestyle="-.", linewidth=width, label="X-axis")
-    # plt.plot(T, Y, linestyle="-.", linewidth=width, label="Y-axis")
-    # plt.plot(T, Z, linestyle="-.", linewidth=width, label="Z-axis")
-    plt.plot(T, GX, linewidth=width*0.8, label="X-axis(filter)")
-    plt.plot(T, GY, linewidth=width*0.8, label="Y-axis(filter)")
-    plt.plot(T, GZ, linewidth=width*0.8, label="Z-axis(filter)")
+    plt.plot(T, GX, linewidth=width*0.8, label="X-axis accel")
+    plt.plot(T, GY, linewidth=width*0.8, label="Y-axis accel")
+    plt.plot(T, GZ, linewidth=width*0.8, label="Z-axis accel")
+    plt.plot(T, GV, linewidth=width*0.8, linestyle=':', label="velocity")
     plt.xlim(xlim[0], xlim[1])
     plt.ylim(ylim[0], ylim[1])
     plt.legend(bbox_to_anchor=(0, 1), loc='upper left',
