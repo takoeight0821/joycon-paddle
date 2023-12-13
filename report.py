@@ -73,8 +73,8 @@ while True:
         T.append(0)
     else:
         T.append(T[-1]+1)
-    logging.info("T: %d, X: %d, Y: %d, Z: %d, GX: %d, GY: %d, GZ: %d", T[-1], X[-1], Y[-1], Z[-1], GX[-1], GY[-1], GZ[-1])
-    logging.info("T: %d, GXV: %d, GYV: %d, GZV: %d, GV: %d", T[-1], GXV[-1], GYV[-1], GZV[-1], GV[-1])
+    logging.info("accel T: %d, X: %d, Y: %d, Z: %d, GX: %d, GY: %d, GZ: %d", T[-1], X[-1], Y[-1], Z[-1], GX[-1], GY[-1], GZ[-1])
+    logging.info("velocity T: %d, GXV: %d, GYV: %d, GZV: %d, GV: %d", T[-1], GXV[-1], GYV[-1], GZV[-1], GV[-1])
     if len(X) >= x_lim:
         xlim[0] += 1
         xlim[1] += 1
