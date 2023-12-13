@@ -1,13 +1,13 @@
 # based on Joy-Conの加速度をリアルタイムプロットする[joycon-python] | mio.yokohama https://mio.yokohama/?p=1205
 
 import time
+import math
 import numpy as np
 from pyjoycon import device
 from pyjoycon.joycon import JoyCon
 from matplotlib import pyplot as plt
 from collections import deque
 import logging
-import numpy as np
 
 def velocity(accels):
     return np.trapz(accels) / len(accels)
