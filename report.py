@@ -1,13 +1,13 @@
 # based on Joy-Conの加速度をリアルタイムプロットする[joycon-python] | mio.yokohama https://mio.yokohama/?p=1205
 
-import time
-import math
-import numpy as np
+from collections import deque
+from matplotlib import pyplot as plt
 from pyjoycon import device
 from pyjoycon.joycon import JoyCon
-from matplotlib import pyplot as plt
-from collections import deque
+from typing import Dict
 import logging
+import numpy as np
+import time
 
 def velocity(accels):
     return np.trapz(accels) / len(accels)
@@ -18,8 +18,10 @@ def velocity(accels):
 logging.basicConfig(filename= "report_" + time.strftime("%Y%m%d-%H%M%S") + ".log", encoding='utf-8', level=logging.INFO)
 
 # JoyCon
-id = device.get_L_id()
-joycon = JoyCon(*id)
+lid = device.get_L_id()
+ljoycon = JoyCon(*lid)
+rid = device.get_R_id()
+rjoycon = JoyCon(*rid)
 
 gravity = [0, 0, 0]
 def filter(x, y, z):
@@ -31,6 +33,9 @@ def filter(x, y, z):
 
     return [x - gravity[0], y - gravity[1], z - gravity[2]]
 
+def addAverage(left: Dict[str, float], right: Dict[str, float]) -> None:
+    return {"x": (left["x"] + right["x"]) / 2, "y": (left["y"] + right["y"]) / 2, "z": (left["z"] + right["z"]) / 2}
+
 # set figure
 x_lim = 50
 width = 2.5
@@ -41,7 +46,7 @@ plt.figure()
 li = plt.plot(t, y)
 plt.ylim(0, 5)
 xlim = [0, x_lim]
-ylim = [-100, 10000]
+ylim = [-100, 5000]
 X, Y, Z, T = deque(maxlen=x_lim), deque(maxlen=x_lim), deque(maxlen=x_lim), deque(maxlen=x_lim)
 GX, GY, GZ = deque(maxlen=x_lim), deque(maxlen=x_lim), deque(maxlen=x_lim)
 GXV, GYV, GZV = deque(maxlen=x_lim), deque(maxlen=x_lim), deque(maxlen=x_lim)
@@ -52,12 +57,16 @@ GV = deque(maxlen=x_lim)
 # ---- #
 while True:
     # get data
-    input_report = joycon.get_status()
+    linput_report = ljoycon.get_status()
+    laccel = linput_report["accel"]
+    rinput_report = rjoycon.get_status()
+    raccel = rinput_report["accel"]
+    accel = addAverage(laccel, raccel)
     # plot
     plt.cla()
-    x = input_report["accel"]["x"]
-    y = input_report["accel"]["y"]
-    z = input_report["accel"]["z"]
+    x = accel["x"]
+    y = accel["y"]
+    z = accel["z"]
     X.append(x)
     Y.append(y)
     Z.append(z)

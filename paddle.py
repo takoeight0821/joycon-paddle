@@ -5,13 +5,18 @@ from pyjoycon import device
 from pyjoycon.joycon import JoyCon
 from typing import Dict, Deque, List
 
-def setupJoyCon():
-    id = device.get_L_id()
-    joycon = JoyCon(*id)
-    return joycon
+def setupJoyCon() -> (JoyCon, JoyCon):
+    lid = device.get_L_id()
+    ljoycon = JoyCon(*lid)
+    rid = device.get_R_id()
+    rjoycon = JoyCon(*rid)
+    return (ljoycon, rjoycon)
 
 def getAccel(joycon: JoyCon) -> Dict[str, float]:
     return joycon.get_status()["accel"]
+
+def addAverage(left: Dict[str, float], right: Dict[str, float]) -> None:
+    return {"x": (left["x"] + right["x"]) / 2, "y": (left["y"] + right["y"]) / 2, "z": (left["z"] + right["z"]) / 2}
 
 def appendAccel(accel: Dict[str, float], X: Deque[float], Y: Deque[float], Z: Deque[float]) -> None:
     X.append(np.abs(accel["x"]))
@@ -44,11 +49,13 @@ def main():
     Y = Deque(maxlen=dataLength)
     Z = Deque(maxlen=dataLength)
 
-    joycon = setupJoyCon()
+    (ljoycon, rjoycon) = setupJoyCon()
     is_pressed = False
 
     while True:
-        accel = getAccel(joycon)
+        lAcc = getAccel(ljoycon)
+        rAcc = getAccel(rjoycon)
+        accel = addAverage(lAcc, rAcc)
         accel = filterGravity(accel)
         print(accel)
         appendAccel(accel, X, Y, Z)
