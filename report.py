@@ -5,9 +5,14 @@ import numpy as np
 from pyjoycon import device
 from pyjoycon.joycon import JoyCon
 from matplotlib import pyplot as plt
+from collections import deque
+import logging
+
 # ---- #
 # init #
 # ---- #
+logging.basicConfig(filename='report.log', encoding='utf-8', level=logging.INFO)
+
 # JoyCon
 id = device.get_L_id()
 joycon = JoyCon(*id)
@@ -23,7 +28,7 @@ def filter(x, y, z):
     return [x - gravity[0], y - gravity[1], z - gravity[2]]
 
 # set figure
-x_lim = 50
+x_lim = 100
 width = 2.5
 t = np.zeros(100)
 y = np.zeros(100)
@@ -33,15 +38,14 @@ li = plt.plot(t, y)
 plt.ylim(0, 5)
 xlim = [0, x_lim]
 ylim = [-10000, 10000]
-X, Y, Z, T = [], [], [], []
-GX, GY, GZ = [], [], []
+X, Y, Z, T = deque(maxlen=x_lim), deque(maxlen=x_lim), deque(maxlen=x_lim), deque(maxlen=x_lim)
+GX, GY, GZ = deque(maxlen=x_lim), deque(maxlen=x_lim), deque(maxlen=x_lim)
 # ---- #
 # plot #
 # ---- #
 while True:
     # get data
     input_report = joycon.get_status()
-    print(input_report)
     # plot
     plt.cla()
     x = input_report["accel"]["x"]
@@ -54,8 +58,12 @@ while True:
     GX.append(gx)
     GY.append(gy)
     GZ.append(gz)
-    T.append(len(T))
-    if len(X) > x_lim:
+    if len(T) == 0:
+        T.append(0)
+    else:
+        T.append(T[-1]+1)
+    logging.info("T: %d, X: %d, Y: %d, Z: %d, GX: %d, GY: %d, GZ: %d", T[-1], X[-1], Y[-1], Z[-1], GX[-1], GY[-1], GZ[-1])
+    if len(X) >= x_lim:
         xlim[0] += 1
         xlim[1] += 1
     # plt.plot(T, X, linestyle="-.", linewidth=width, label="X-axis")
