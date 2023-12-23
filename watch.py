@@ -2,6 +2,7 @@ import time
 from pyjoycon import device
 from pyjoycon.joycon import JoyCon
 import logging
+import paddle
 
 logFormatter = logging.Formatter('%(asctime)s %(message)s')
 rootLogger = logging.getLogger()
@@ -16,36 +17,24 @@ rootLogger.addHandler(consoleHandler)
 
 rootLogger.setLevel(logging.DEBUG)
 
-# Setup
-# Send 0x010602 to enable pair mode
-#ids = device.get_device_ids()
-#for id in ids:
-#    joycon = JoyCon(*id)
-#    joycon._write_output_report(b'\x01', b'\x06', b'\x02')
-#    logging.info("Sent 0x010602 to " + str(id))
+def main():
+    lids = device.get_L_ids()
+    rids = device.get_R_ids()
+    (ljoycon, rjoycon) = paddle.setupJoyCon()
+    logging.info(f"setup: {ljoycon}, {rjoycon}")
+    while True:
+        device_ids = device.get_device_ids()
+        logging.info(f"device_ids: {set(device_ids)}")
+        if not set(lids).issubset(set(device_ids)):
+            logging.info("L JoyCon is disconnected")
+            break
+        if not set(rids).issubset(set(device_ids)):
+            logging.info("R JoyCon is disconnected")
+            break
+        lAcc = paddle.getAccel(ljoycon)
+        rAcc = paddle.getAccel(rjoycon)
+        logging.info(f"accel: {lAcc}, {rAcc}")
+        time.sleep(1)
 
-joyconTable = {}
-
-while True:
-    ids = device.get_device_ids()
-    if ids == []:
-        logging.warning("No JoyCons found.")
-    else:
-        logging.info("JoyCons found: " + str(ids))
-    removed = []
-    for id in joyconTable:
-        if id not in ids:
-            removed.append(id)
-            logging.info("JoyCon disconnected: " + str(id))
-    for id in removed:
-        del joyconTable[id]
-        logging.info("JoyCon removed from table: " + str(id))
-    for id in ids:
-        if id in joyconTable:
-            joycon = joyconTable[id]
-        else:
-            joycon = JoyCon(*id)
-            joyconTable[id] = joycon
-        joycon._write_output_report(b'\x01', b'\x06', b'\x01')
-        logging.info("Sent 0x010601 to " + str(id))
-    time.sleep(5)
+if __name__ == "__main__":
+    main()
