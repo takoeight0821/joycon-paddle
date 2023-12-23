@@ -91,6 +91,8 @@ while True:
     plt.plot(T, GY, linewidth=width*0.8, label="Y-axis accel")
     plt.plot(T, GZ, linewidth=width*0.8, label="Z-axis accel")
     plt.plot(T, GV, linewidth=width*0.8, linestyle=':', label="velocity")
+    # plot threshold line
+    plt.plot(T, [1000]*len(T), linewidth=width, linestyle='--', color='black', label="threshold")
     plt.xlim(xlim[0], xlim[1])
     plt.ylim(ylim[0], ylim[1])
     plt.legend(bbox_to_anchor=(0, 1), loc='upper left',
