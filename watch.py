@@ -40,7 +40,7 @@ def main():
             try:
                 ljoycon = JoyCon(*lid)
                 lconnectTime = time.time()
-            except AssertionError as e:
+            except Exception as e:
                 # ignore assertion error on _spi_flash_read and retry in next loop
                 logging.error(e)
                 del ljoycon
@@ -56,7 +56,7 @@ def main():
             try:
                 rjoycon = JoyCon(*rid)
                 rconnectTime = time.time()
-            except AssertionError as e:
+            except Exception as e:
                 logging.error(e)
                 del rjoycon
                 rjoycon = None
