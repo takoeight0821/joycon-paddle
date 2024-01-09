@@ -3,7 +3,7 @@ import time
 from pyjoycon import device
 from pyjoycon.joycon import JoyCon
 import logging
-import paddle
+import scripts.rowing as rowing
 
 logFormatter = logging.Formatter('%(asctime)s %(message)s')
 rootLogger = logging.getLogger()
@@ -61,9 +61,9 @@ def main():
                 del rjoycon
                 rjoycon = None
         if not ljoycon is None:
-            lAcc = paddle.getAccel(ljoycon)
+            lAcc = rowing.getAccel(ljoycon)
         if not rjoycon is None:
-            rAcc = paddle.getAccel(rjoycon)
+            rAcc = rowing.getAccel(rjoycon)
         logging.info(f"accel: {lAcc}, {rAcc}")
         time.sleep(1)
 
