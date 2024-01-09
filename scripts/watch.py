@@ -3,7 +3,7 @@ import time
 from pyjoycon import device
 from pyjoycon.joycon import JoyCon
 import logging
-import scripts.rowing as rowing
+import rowing
 
 logFormatter = logging.Formatter('%(asctime)s %(message)s')
 rootLogger = logging.getLogger()
