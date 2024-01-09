@@ -1,9 +1,23 @@
+import logging
 import time
 import numpy as np
 import pyautogui
 from pyjoycon import device
 from pyjoycon.joycon import JoyCon
 from typing import Dict, Deque, List, Tuple
+
+logFormatter = logging.Formatter('%(asctime)s %(message)s')
+rootLogger = logging.getLogger()
+
+fileHandler = logging.FileHandler("paddle_" + time.strftime("%Y%m%d-%H%M%S") + ".log")
+fileHandler.setFormatter(logFormatter)
+rootLogger.addHandler(fileHandler)
+
+consoleHandler = logging.StreamHandler()
+consoleHandler.setFormatter(logFormatter)
+rootLogger.addHandler(consoleHandler)
+
+rootLogger.setLevel(logging.DEBUG)
 
 def setupJoyCon() -> Tuple[JoyCon, JoyCon]:
     lid = device.get_L_id()
@@ -48,29 +62,73 @@ def main():
     Y = Deque(maxlen=dataLength)
     Z = Deque(maxlen=dataLength)
 
-    (ljoycon, rjoycon) = setupJoyCon()
+    # (ljoycon, rjoycon) = setupJoyCon()
+    lid = device.get_L_id()
+    rid = device.get_R_id()
+    logging.info(f"setup: {lid}, {rid}")
+    ljoycon = None
+    rjoycon = None
+
     is_pressed = False
 
+    lAcc = 0
+    rAcc = 0
+
     while True:
-        lAcc = getAccel(ljoycon)
-        rAcc = getAccel(rjoycon)
+        # watch for connection
+        deviceIds = device.get_device_ids()
+        logging.info(f"device_ids: {deviceIds}")
+
+        if not lid in deviceIds:
+            logging.warn("L JoyCon is disconnected")
+            del ljoycon
+            ljoycon = None
+        elif ljoycon is None:
+            logging.warn("L JoyCon is connected")
+            try:
+                ljoycon = JoyCon(*lid)
+            except Exception as e:
+                # ignore assertion error on _spi_flash_read and retry in next loop
+                logging.error(e)
+                del ljoycon
+                ljoycon = None
+        
+        if not rid in deviceIds:
+            logging.warn("R JoyCon is disconnected")
+            del rjoycon
+            rjoycon = None
+        elif rjoycon is None:
+            logging.warn("R JoyCon is connected")
+            try:
+                rjoycon = JoyCon(*rid)
+            except Exception as e:
+                logging.error(e)
+                del rjoycon
+                rjoycon = None
+        
+        if not ljoycon is None:
+            lAcc = getAccel(ljoycon)
+        
+        if not rjoycon is None:
+            rAcc = getAccel(rjoycon)
+
         accel = addAverage(lAcc, rAcc)
         accel = filterGravity(accel)
-        print(accel)
+        logging.info(f"accel: {accel}")
         appendAccel(accel, X, Y, Z)
         velocity = getVelocity(X, Y, Z)
-        print(velocity)
+        logging.info(f"velocity: {velocity}")
 
         if velocity > threshold and not is_pressed:
             is_pressed = True
-            print(is_pressed)
+            logging.info("pressed")
             pyautogui.keyDown('s')
         elif velocity <= threshold and is_pressed:
             is_pressed = False
-            print(is_pressed)
+            logging.info("released")
             pyautogui.keyUp('s')
         else:
-            print("no change ", is_pressed)
+            logging.info("no change")
         time.sleep(1/60)
 
 if __name__ == "__main__":
