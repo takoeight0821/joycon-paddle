@@ -1,5 +1,5 @@
 {
     "python": "$HOME/.pyenv/shims/python",
-    "script": "./scripts/paddle.py",
+    "script": "./scripts/rowing.py",
     "path": "$HOME/.pyenv/shims:$HOME/.pyenv/bin:$PATH"
 }

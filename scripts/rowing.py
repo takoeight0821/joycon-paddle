@@ -9,7 +9,7 @@ from typing import Dict, Deque, List, Tuple
 logFormatter = logging.Formatter('%(asctime)s %(message)s')
 rootLogger = logging.getLogger()
 
-fileHandler = logging.FileHandler("paddle_" + time.strftime("%Y%m%d-%H%M%S") + ".log")
+fileHandler = logging.FileHandler("rowing_" + time.strftime("%Y%m%d-%H%M%S") + ".log")
 fileHandler.setFormatter(logFormatter)
 rootLogger.addHandler(fileHandler)
 

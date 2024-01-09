@@ -1,4 +1,4 @@
-// Run paddle.py with the configured environment.
+// Run a Python script with the configured environment.
 // The configuration is read from the file `config.json`.
 package main
 
