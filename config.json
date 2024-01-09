@@ -1,0 +1,5 @@
+{
+    "python": "$HOME/.pyenv/shims/python",
+    "script": "./scripts/paddle.py",
+    "path": "$HOME/.pyenv/shims:$HOME/.pyenv/bin:$PATH"
+}
