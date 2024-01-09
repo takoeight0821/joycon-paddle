@@ -1,6 +1,6 @@
 // Run paddle.py with the configured environment.
 // The configuration is read from the file `config.json`.
-package run_paddle
+package main
 
 import (
 	"encoding/json"
