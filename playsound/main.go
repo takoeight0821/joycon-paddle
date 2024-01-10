@@ -3,6 +3,7 @@ package main
 import (
 	"embed"
 	"log"
+	"net"
 	"net/http"
 	"time"
 
@@ -81,6 +82,24 @@ func dispathDaemon(c chan Message) {
 	}
 }
 
+func getLocalIPs() ([]net.IP, error) {
+	var ips []net.IP
+	addresses, err := net.InterfaceAddrs()
+	if err != nil {
+		return nil, err
+	}
+
+	for _, address := range addresses {
+		if ipnet, ok := address.(*net.IPNet); ok && !ipnet.IP.IsLoopback() {
+			if ipnet.IP.To4() != nil {
+				ips = append(ips, ipnet.IP)
+			}
+		}
+	}
+
+	return ips, nil
+}
+
 func main() {
 	c := make(chan Message)
 	go dispathDaemon(c)
@@ -92,6 +111,15 @@ func main() {
 		log.Printf("/stop")
 		c <- RowStop
 	})
+
+	ips, err := getLocalIPs()
+	if err != nil {
+		log.Panicf("error getting local IPs: %v", err)
+	}
+
+	for _, ip := range ips {
+		log.Printf("listening on http://%v:8080", ip)
+	}
 
 	log.Fatal(http.ListenAndServe(":8080", nil))
 }
