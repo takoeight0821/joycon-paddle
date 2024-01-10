@@ -5,6 +5,7 @@ import pyautogui
 from pyjoycon import device
 from pyjoycon.joycon import JoyCon
 from typing import Dict, Deque, List, Tuple
+import urllib.request
 
 logFormatter = logging.Formatter('%(asctime)s %(message)s')
 rootLogger = logging.getLogger()
@@ -18,6 +19,9 @@ consoleHandler.setFormatter(logFormatter)
 rootLogger.addHandler(consoleHandler)
 
 rootLogger.setLevel(logging.DEBUG)
+
+# the address of the play sound server.
+serverAddress = "http://localhost:8080"
 
 def setupJoyCon() -> Tuple[JoyCon, JoyCon]:
     lid = device.get_L_id()
@@ -123,10 +127,12 @@ def main():
             is_pressed = True
             logging.info("pressed")
             pyautogui.keyDown('s')
+            urllib.request.urlopen(serverAddress + "/start").read()
         elif velocity <= threshold and is_pressed:
             is_pressed = False
             logging.info("released")
             pyautogui.keyUp('s')
+            urllib.request.urlopen(serverAddress + "/stop").read()
         else:
             logging.info("no change")
         time.sleep(1/60)
