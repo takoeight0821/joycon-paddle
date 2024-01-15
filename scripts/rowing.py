@@ -127,12 +127,18 @@ def main():
             is_pressed = True
             logging.info("pressed")
             pyautogui.keyDown('s')
-            urllib.request.urlopen(serverAddress + "/start").read()
+            try:
+                urllib.request.urlopen(serverAddress + "/start").read()
+            except Exception as e:
+                logging.error(e)
         elif velocity <= threshold and is_pressed:
             is_pressed = False
             logging.info("released")
             pyautogui.keyUp('s')
-            urllib.request.urlopen(serverAddress + "/stop").read()
+            try:
+                urllib.request.urlopen(serverAddress + "/stop").read()
+            except Exception as e:
+                logging.error(e)
         else:
             logging.info("no change")
         time.sleep(1/60)
