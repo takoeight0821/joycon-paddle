@@ -26,7 +26,7 @@ const (
 )
 
 func soundDaemon(playingChan chan bool) {
-	// if rowing_boat_sound.mp3 is found in the directory this program exists in, it will be used.
+	// if a mp3 file is found in the directory this program exists in, it will be used.
 	commandPath, err := os.Executable()
 	if err != nil {
 		log.Panicf("error getting executable path: %v", err)
@@ -36,7 +36,23 @@ func soundDaemon(playingChan chan bool) {
 
 	var f fs.File
 
-	if f, err = os.Open(filepath.Join(commandDir, "rowing_boat_sound.mp3")); err != nil {
+	// search mp3 file in the directory this program exists in
+	files, err := os.ReadDir(commandDir)
+	if err != nil {
+		log.Panicf("error reading directory: %v", err)
+	}
+	mp3File := "rowing_boat_sound.mp3"
+	for _, file := range files {
+		if file.IsDir() {
+			continue
+		}
+		if filepath.Ext(file.Name()) == ".mp3" {
+			mp3File = file.Name()
+			break
+		}
+	}
+
+	if f, err = os.Open(filepath.Join(commandDir, mp3File)); err != nil {
 		f, err = sound.Open("rowing_boat_sound.mp3")
 		if err != nil {
 			log.Panicf("error opening sound file: %v", err)
