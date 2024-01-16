@@ -2,9 +2,12 @@ package main
 
 import (
 	"embed"
+	"io/fs"
 	"log"
 	"net"
 	"net/http"
+	"os"
+	"path/filepath"
 	"time"
 
 	"github.com/gopxl/beep"
@@ -23,10 +26,23 @@ const (
 )
 
 func soundDaemon(playingChan chan bool) {
-	f, err := sound.Open("rowing_boat_sound.mp3")
+	// if rowing_boat_sound.mp3 is found in the directory this program exists in, it will be used.
+	commandPath, err := os.Executable()
 	if err != nil {
-		log.Panicf("error opening sound file: %v", err)
+		log.Panicf("error getting executable path: %v", err)
 	}
+
+	commandDir := filepath.Dir(commandPath)
+
+	var f fs.File
+
+	if f, err = os.Open(filepath.Join(commandDir, "rowing_boat_sound.mp3")); err != nil {
+		f, err = sound.Open("rowing_boat_sound.mp3")
+		if err != nil {
+			log.Panicf("error opening sound file: %v", err)
+		}
+	}
+
 	defer f.Close()
 
 	streamer, format, err := mp3.Decode(f)
