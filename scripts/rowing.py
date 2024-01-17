@@ -21,7 +21,7 @@ rootLogger.addHandler(consoleHandler)
 rootLogger.setLevel(logging.DEBUG)
 
 # the address of the play sound server.
-serverAddress = "http://localhost:8080"
+serverAddress = "http://192.168.11.2:8080"
 
 def setupJoyCon() -> Tuple[JoyCon, JoyCon]:
     lid = device.get_L_id()
@@ -60,7 +60,7 @@ def getVelocity(X: Deque[float], Y: Deque[float], Z: Deque[float]) -> float:
 
 def main():
     dataLength = 60
-    threshold = 1000
+    threshold = 700
 
     X = Deque(maxlen=dataLength)
     Y = Deque(maxlen=dataLength)
@@ -128,6 +128,7 @@ def main():
             logging.info("pressed")
             pyautogui.keyDown('s')
             try:
+                #pass
                 urllib.request.urlopen(serverAddress + "/start").read()
             except Exception as e:
                 logging.error(e)
@@ -136,6 +137,7 @@ def main():
             logging.info("released")
             pyautogui.keyUp('s')
             try:
+                #pass
                 urllib.request.urlopen(serverAddress + "/stop").read()
             except Exception as e:
                 logging.error(e)
@@ -145,4 +147,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-        
