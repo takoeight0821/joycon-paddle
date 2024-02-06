@@ -1,4 +1,5 @@
 import logging
+import threading
 import time
 import numpy as np
 import pyautogui
@@ -93,7 +94,19 @@ class Button:
             self.isPressed = False
             return True
         return False
+
+def soundStart():
+    try:
+        urllib.request.urlopen(serverAddress + "/start").read()
+    except Exception as e:
+        logging.error(e)
     
+def soundStop():
+    try:
+        urllib.request.urlopen(serverAddress + "/stop").read()
+    except Exception as e:
+        logging.error(e)
+
 def main():
     dataLength = 60
     threshold = 700
@@ -182,41 +195,27 @@ def main():
             leftButton.release()
             rightButton.release()
             avgButton.press()
-            try:
-                #pass
-                urllib.request.urlopen(serverAddress + "/start").read()
-            except Exception as e:
-                logging.error(e)
+            threading.Thread(target=soundStart).start()
         elif leftVelocity > threshold and rightVelocity <= threshold:
             logging.info("left: press a")
             avgButton.release()
             rightButton.release()
             leftButton.press()
-            try:
-                urllib.request.urlopen(serverAddress + "/start").read()
-            except Exception as e:
-                logging.error(e)
+            threading.Thread(target=soundStart).start()
         elif leftVelocity <= threshold and rightVelocity > threshold:
             logging.info("right: press d")
             avgButton.release()
             leftButton.release()
             rightButton.press()
-            try:
-                urllib.request.urlopen(serverAddress + "/start").read()
-            except Exception as e:
-                logging.error(e)
+            threading.Thread(target=soundStart).start()
         else:
             logging.info("release all")
             avgButton.release()
             leftButton.release()
             rightButton.release()
-            try:
-                #pass
-                urllib.request.urlopen(serverAddress + "/stop").read()
-            except Exception as e:
-                logging.error(e)
+            threading.Thread(target=soundStop).start()
 
-        time.sleep(1/60)
+        time.sleep(1/120)
 
 if __name__ == "__main__":
     main()
