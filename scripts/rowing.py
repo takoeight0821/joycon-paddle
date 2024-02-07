@@ -122,8 +122,6 @@ def main():
     ljoycon = None
     rjoycon = None
 
-    is_pressed = False
-
     leftAccel = 0
     rightAccel = 0
     
@@ -192,28 +190,32 @@ def main():
         
         if leftVelocity > threshold and rightVelocity > threshold:
             logging.info("both: press s")
-            leftButton.release()
-            rightButton.release()
-            avgButton.press()
-            threading.Thread(target=soundStart).start()
+            leftReleased = leftButton.release()
+            rightReleased = rightButton.release()
+            avgPressed = avgButton.press()
+            if not leftReleased and not rightReleased and avgPressed:
+                soundStart()
         elif leftVelocity > threshold and rightVelocity <= threshold:
             logging.info("left: press a")
-            avgButton.release()
-            rightButton.release()
-            leftButton.press()
-            threading.Thread(target=soundStart).start()
+            avgReleased = avgButton.release()
+            rightReleased = rightButton.release()
+            leftPressed = leftButton.press()
+            if not avgReleased and not rightReleased and leftPressed:
+                soundStart()
         elif leftVelocity <= threshold and rightVelocity > threshold:
             logging.info("right: press d")
-            avgButton.release()
-            leftButton.release()
-            rightButton.press()
-            threading.Thread(target=soundStart).start()
+            avgReleased = avgButton.release()
+            leftReleased = leftButton.release()
+            rightPressed = rightButton.press()
+            if not avgReleased and not leftReleased and rightPressed:
+                soundStart()
         else:
             logging.info("release all")
-            avgButton.release()
-            leftButton.release()
-            rightButton.release()
-            threading.Thread(target=soundStop).start()
+            avgReleased = avgButton.release()
+            leftReleased = leftButton.release()
+            rightReleased = rightButton.release()
+            if avgReleased or leftReleased or rightReleased:
+                soundStop()
 
         time.sleep(1/120)
 
